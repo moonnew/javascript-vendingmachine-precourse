@@ -19,25 +19,23 @@ export default class ProductPurchase extends Component {
   }
 
   mounted() {
-    new Header(this.$("[data-component='header']"), {
+    this.$children.header = new Header(this.$("[data-component='header']"), {
       sendInserted: this.sendInserted.bind(this),
     });
 
-    new Inserted(this.$("[data-component='inserted']"));
+    this.$children.inserted = new Inserted(this.$("[data-component='inserted']"));
 
-    new Products(this.$("[data-component='products']"), {
+    this.$children.products = new Products(this.$("[data-component='products']"), {
       checkPurchase: this.checkPurchase.bind(this),
     });
 
-    new Changes(this.$("[data-component='changes']"), {
+    this.$children.changes = new Changes(this.$("[data-component='changes']"), {
       checkReturnChanges: this.checkReturnChanges.bind(this),
     });
   }
 
   sendInserted(inserted) {
-    new Inserted(this.$("[data-component='inserted']"), {
-      inserted,
-    });
+    this.$children.inserted.setProps({ inserted });
   }
 
   checkPurchase(index) {
@@ -53,7 +51,9 @@ export default class ProductPurchase extends Component {
   }
 
   purchase(index, products, inserted) {
-    inserted -= products[index].price;
+    let purchased = products[index].price;
+
+    //inserted -= products[index].price;
     products[index].quantity -= 1;
 
     if (products[index].quantity == 0) {
@@ -61,9 +61,10 @@ export default class ProductPurchase extends Component {
     }
 
     saveToStorage(CONSTANTS.STORAGE_PRODUCTS_KEY, products);
-    saveToStorage(CONSTANTS.STORAGE_INSERTED_KEY, inserted);
+    //saveToStorage(CONSTANTS.STORAGE_INSERTED_KEY, inserted);
 
-    new Inserted(this.$("[data-component='inserted']"));
+    this.$children.inserted.setProps({ purchased });
+    //new Inserted(this.$("[data-component='inserted']"));
   }
 
   checkReturnChanges(returnedChanges) {
@@ -91,6 +92,8 @@ export default class ProductPurchase extends Component {
   }
 
   returnChanges(returnedChanges, inserted, changes, remains) {
+    let change = 0;
+
     CONSTANTS.COINS.forEach(function (unit) {
       let changeRemained = changes[unit];
       let quotient = Math.floor(inserted / unit);
@@ -102,8 +105,10 @@ export default class ProductPurchase extends Component {
       returnedChanges[unit] = quantity;
       changes[unit] -= quantity;
       remains -= unit * quantity;
+      change += unit * quantity;
     });
 
+    this.$children.inserted.setProps({ change });
     this.updateChanges(inserted, changes, remains);
   }
 
@@ -112,6 +117,6 @@ export default class ProductPurchase extends Component {
     saveToStorage(CONSTANTS.STORAGE_REMAINS_KEY, remains);
     saveToStorage(CONSTANTS.STORAGE_INSERTED_KEY, inserted);
 
-    new Inserted(this.$("[data-component='inserted']"));
+    //new Inserted(this.$("[data-component='inserted']"));
   }
 }

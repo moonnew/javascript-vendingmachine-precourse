@@ -36,10 +36,10 @@ export default class Stored extends Component {
       remains: loadFromStorage(CONSTANTS.STORAGE_REMAINS_KEY),
     };
 
-    this.checkProps();
+    this.applyProps();
   }
 
-  checkProps() {
+  applyProps() {
     if (this.$props) {
       let makedChanges = this.$props.makedChanges;
 

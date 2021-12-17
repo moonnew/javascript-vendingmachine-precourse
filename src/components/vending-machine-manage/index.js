@@ -13,15 +13,13 @@ export default class VendingMachineManage extends Component {
   }
 
   mounted() {
-    new Header(this.$('[data-component="header"]'), {
+    this.$children.header = new Header(this.$('[data-component="header"]'), {
       chargeChanges: this.chargeChanges.bind(this),
     });
-    new Stored(this.$('[data-component="stored"]'));
+    this.$children.stored = new Stored(this.$('[data-component="stored"]'));
   }
 
   chargeChanges(makedChanges) {
-    new Stored(this.$('[data-component="stored"]'), {
-      makedChanges,
-    });
+    this.$children.stored.setProps({ makedChanges });
   }
 }

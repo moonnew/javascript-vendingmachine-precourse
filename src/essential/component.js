@@ -2,10 +2,12 @@ export default class Component {
   $target;
   $props;
   $state;
+  $children;
 
   constructor($target, $props) {
     this.$target = $target;
     this.$props = $props;
+    this.$children = {};
     this.setup();
     this.setEvent();
     this.render();
@@ -25,9 +27,12 @@ export default class Component {
     return '';
   }
 
+  applyProps() {}
+
   mounted() {}
 
   render() {
+    this.applyProps();
     this.$target.innerHTML = this.template();
     this.mounted();
   }
@@ -47,5 +52,13 @@ export default class Component {
       if (!isTarget(event.target)) return false;
       callback(event);
     });
+  }
+
+  setProps(newProps, isRender = true) {
+    this.$props = newProps;
+
+    if (isRender) {
+      this.render();
+    }
   }
 }

@@ -9,6 +9,7 @@ const HEAD = `
         <th>상품명</th>
         <th>가격</th>
         <th>수량</th>
+        <th>삭제</th>
     </thead>
     <tbody>
 `;
@@ -16,11 +17,16 @@ const HEAD = `
 const BODY = products => `
   ${products
     .map(
-      ({ name, price, quantity }) => `
+      ({ name, price, quantity }, index) => `
       <tr class="product-manage-item">
         <td class="product-manage-name">${name}</td>
         <td class="product-manage-price">${price}</td>
         <td class="product-manage-quantity">${quantity}</td>
+        <td
+        data-product-index="${index}" data-product-name="${name}"
+        data-product-price="${price}" data-product-quantity="${quantity}">
+        <input type="button" class="remove-button" value="삭제하기" />
+      </td>
       </tr>
   `,
     )
@@ -38,19 +44,38 @@ export default class Table extends Component {
       products: loadFromStorage(CONSTANTS.STORAGE_PRODUCTS_KEY),
     };
 
-    this.checkProps();
+    this.applyProps();
   }
 
-  checkProps() {
-    if (this.$props) {
+  applyProps() {
+    if (this.$props && this.$props.product) {
       let product = this.$props.product;
 
       this.$state.products.push(product);
       saveToStorage(CONSTANTS.STORAGE_PRODUCTS_KEY, this.$state.products);
+
+      delete this.$props.product;
     }
   }
 
   template() {
     return HEAD + BODY(this.$state.products) + TAIL;
+  }
+
+  setEvent() {
+    this.addEvent('click', '.remove-button', ({ target }) => {
+      let index = target.parentElement.dataset.productIndex;
+      let products = this.$state.products;
+      //let products = loadFromStorage(CONSTANTS.STORAGE_PRODUCTS_KEY);
+
+      products[index].quantity -= 1;
+
+      if (products[index].quantity == 0) {
+        products.splice(index, 1);
+      }
+
+      saveToStorage(CONSTANTS.STORAGE_PRODUCTS_KEY, this.$state.products);
+      this.render();
+    });
   }
 }

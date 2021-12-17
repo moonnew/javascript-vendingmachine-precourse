@@ -13,15 +13,13 @@ export default class ProductAdd extends Component {
   }
 
   mounted() {
-    new Header(this.$('[data-component="header"]'), {
+    this.$children.header = new Header(this.$('[data-component="header"]'), {
       sendProduct: this.sendProduct.bind(this),
     });
-    new Table(this.$('[data-component="table"]'));
+    this.$children.table = new Table(this.$('[data-component="table"]'));
   }
 
   sendProduct(product) {
-    new Table(this.$('[data-component="table"]'), {
-      product,
-    });
+    this.$children.table.setProps({ product });
   }
 }
